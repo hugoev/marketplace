@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ListingCard } from '@/components/ListingCard';
 
 export default function ListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
