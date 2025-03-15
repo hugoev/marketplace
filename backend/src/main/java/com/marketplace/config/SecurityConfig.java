@@ -26,9 +26,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api-docs/**").permitAll()
                 // Protected endpoints
-                .requestMatchers("/api/listings/create").authenticated()
-                .requestMatchers("/api/users/**").authenticated()
-                .anyRequest().authenticated());
+                .anyRequest().permitAll());
         
         return http.build();
     }

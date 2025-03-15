@@ -5,6 +5,7 @@ import com.marketplace.entity.User;
 import com.marketplace.repository.ListingRepository;
 import com.marketplace.repository.CategoryRepository;
 import com.marketplace.dto.ListingDTO;
+import com.marketplace.dto.ListingDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,12 +109,9 @@ public class ListingService {
             .map(this::convertToDTO);
     }
 
-    public ListingDetailDTO getPublicListingDetail(Long id) {
-        Listing listing = listingRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
-            
+    public ListingDetailDTO getListingDetail(Long id) {
+        Listing listing = getListing(id);
         ListingDetailDTO dto = new ListingDetailDTO();
-        // Map basic fields
         dto.setId(listing.getId());
         dto.setTitle(listing.getTitle());
         dto.setDescription(listing.getDescription());
@@ -120,17 +119,26 @@ public class ListingService {
         dto.setLocation(listing.getLocation());
         dto.setCategory(listing.getCategory().getName());
         dto.setCreatedAt(listing.getCreatedAt());
-        
-        // Map contact information
-        dto.setContactEmail(listing.getUser().getEmail());
-        dto.setContactPhone(listing.getUser().getPhoneNumber());
-        dto.setPreferredContact(listing.getPreferredContact());
-        
-        // Map images
-        dto.setImageUrls(listing.getImages().stream()
-            .map(ListingImage::getImageUrl)
-            .collect(Collectors.toList()));
-            
+        dto.setSellerName(listing.getUser().getFirstName() + " " + listing.getUser().getLastName());
+        dto.setSellerEmail(listing.getUser().getEmail());
+        dto.setSellerPhone(listing.getUser().getPhoneNumber());
+        return dto;
+    }
+
+    public List<ListingDTO> getListings(int page, int size) {
+        Page<Listing> listingPage = listingRepository.findAll(PageRequest.of(page, size));
+        return listingPage.getContent().stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    private ListingDTO convertToDTO(Listing listing) {
+        ListingDTO dto = new ListingDTO();
+        dto.setTitle(listing.getTitle());
+        dto.setDescription(listing.getDescription());
+        dto.setPrice(listing.getPrice());
+        dto.setCategoryId(listing.getCategory().getId());
+        dto.setLocation(listing.getLocation());
         return dto;
     }
 } 

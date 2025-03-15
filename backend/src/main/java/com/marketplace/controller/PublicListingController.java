@@ -1,33 +1,29 @@
 package com.marketplace.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.marketplace.dto.ListingDTO;
+import com.marketplace.dto.ListingDetailDTO;
+import com.marketplace.service.ListingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/public/listings")
-@Tag(name = "Public Listings", description = "Public endpoints for viewing listings")
 public class PublicListingController {
-
+    
     @Autowired
     private ListingService listingService;
 
-    @Operation(summary = "Get all listings", description = "View all listings without authentication")
     @GetMapping
-    public ResponseEntity<Page<ListingDTO>> getListings(
+    public ResponseEntity<List<ListingDTO>> getListings(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String location) {
-        return ResponseEntity.ok(listingService.getPublicListings(page, size, category, location));
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(listingService.getListings(page, size));
     }
 
-    @Operation(summary = "Get listing details", description = "View single listing with contact information")
     @GetMapping("/{id}")
     public ResponseEntity<ListingDetailDTO> getListingDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(listingService.getPublicListingDetail(id));
+        return ResponseEntity.ok(listingService.getListingDetail(id));
     }
 } 

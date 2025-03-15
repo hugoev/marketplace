@@ -22,4 +22,8 @@ public class ListingDetailDTO {
     
     // Images
     private List<String> imageUrls;
+
+    private String sellerName;
+    private String sellerEmail;
+    private String sellerPhone;
 } 
