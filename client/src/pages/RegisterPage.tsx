@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const { login } = useAuth();
 
   const state = location.state as LocationState;
-  const from = state?.from || '/marketplace';
+  const from = state?.from || '/';
 
   const validateForm = () => {
     if (password.length < 8) {
@@ -66,7 +66,7 @@ export default function RegisterPage() {
         password,
       });
       await login(response.token);
-      navigate('/marketplace');
+      navigate('/');
     } catch (err: any) {
       if (err.response?.status === 409) {
         setError('An account with this email already exists');

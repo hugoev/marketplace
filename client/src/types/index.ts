@@ -45,4 +45,13 @@ export interface ListingDetail extends Listing {
   contactEmail: string;
   contactPhone: string;
   preferredContact: 'email' | 'phone' | 'both';
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
 } 

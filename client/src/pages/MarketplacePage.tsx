@@ -93,11 +93,7 @@ export default function MarketplacePage() {
     error,
     filters,
     updateFilters,
-  } = useProducts({
-    priceRange: defaultPriceRange,
-    sortBy: 'newest',
-    sortDirection: 'desc'
-  });
+  } = useProducts();
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -431,17 +427,14 @@ export default function MarketplacePage() {
                     {['New', 'Like New', 'Good', 'Fair'].map((condition) => (
                       <label key={condition} className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg cursor-pointer">
                         <input
-                          type="checkbox"
+                          type="radio"
+                          name="condition"
                           className="rounded border-gray-300"
-                          checked={filters.condition?.includes(condition)}
+                          checked={filters.condition === condition}
                           onChange={(e) => {
-                            const current = filters.condition || []
-                            handleFilterChange(
-                              'condition',
-                              e.target.checked
-                                ? [...current, condition]
-                                : current.filter(c => c !== condition)
-                            )
+                            if (e.target.checked) {
+                              handleFilterChange('condition', condition);
+                            }
                           }}
                         />
                         <span className="text-sm">{condition}</span>

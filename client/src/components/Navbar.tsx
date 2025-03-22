@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Search, MapPin, Heart, Bell, Menu, X, User, LogOut, Settings, UserCircle } from 'lucide-react';
 import { Input } from './ui/input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Popover,
@@ -47,11 +47,26 @@ export default function Navbar() {
   const [tempLocation, setTempLocation] = useState(userLocation);
   const navigate = useNavigate();
   const location = useLocation();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Save location to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('userLocation', userLocation);
   }, [userLocation]);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Command+K (Mac) or Control+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault(); // Prevent default browser behavior
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
@@ -170,6 +185,7 @@ export default function Navbar() {
             <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
               <div className="relative group">
                 <Input 
+                  ref={searchInputRef}
                   placeholder="Search for anything..." 
                   className="w-full pl-10 h-11 bg-gray-50 border-gray-200 group-hover:border-gray-300 transition-colors"
                   value={searchQuery}

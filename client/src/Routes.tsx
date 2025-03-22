@@ -68,13 +68,13 @@ export default function Routes() {
         <Route
           path="/login"
           element={
-            isAuthenticated ? <Navigate to="/marketplace" /> : <LoginPage />
+            isAuthenticated ? <Navigate to="/" /> : <LoginPage />
           }
         />
         <Route
           path="/register"
           element={
-            isAuthenticated ? <Navigate to="/marketplace" /> : <RegisterPage />
+            isAuthenticated ? <Navigate to="/" /> : <RegisterPage />
           }
         />
       </RouterRoutes>

@@ -32,7 +32,7 @@ export interface Product {
 export interface ProductFilters {
   maxPrice?: number;
   category?: string;
-  condition?: string | string[];
+  condition?: string;
   search?: string;
   page?: number;
   sortBy?: string;
