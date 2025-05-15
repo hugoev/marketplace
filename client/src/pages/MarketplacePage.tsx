@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -37,7 +37,8 @@ import {
   Link as LinkIcon,
   MoreVertical,
   Instagram,
-  Loader2
+  Loader2,
+  Plus
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -110,6 +111,8 @@ export default function MarketplacePage() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentListings = products?.slice(startIndex, endIndex) || []
+
+  const navigate = useNavigate();
 
   const handleFilterChange = (type: keyof ProductFilters, value: any) => {
     updateFilters({
@@ -224,132 +227,301 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-screen bg-[#F7F7F7] pb-12">
       {/* Filters Header */}
-      <div className="sticky top-[7.5rem] z-10 bg-white border-b shadow-sm">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 border-gray-200"
-                    onClick={() => setIsFiltersOpen(true)}
-                  >
-                    <Filter className="h-4 w-4" />
-                    Filters
-                  </Button>
-                  <SheetContent side="left" className="w-full sm:w-[380px] p-0">
-                    <SheetHeader className="p-6 border-b">
-                      <SheetTitle>Filters</SheetTitle>
-                    </SheetHeader>
-                    <ScrollArea className="h-[calc(100vh-80px)] p-6">
-                      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-                        <Input
-                          type="text"
-                          placeholder="Search products..."
-                          onChange={(e) => updateFilters({ search: e.target.value })}
-                          className="w-full"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Max price"
-                          onChange={(e) => updateFilters({ maxPrice: Number(e.target.value) })}
-                          className="w-full"
-                        />
-                        <div className="border-b pb-6">
-                          <label className="block text-sm font-medium mb-3">Category</label>
-                          <Select
-                            value={filters.category || "all"}
-                            onValueChange={handleCategoryFilter}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="All Categories" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Categories</SelectItem>
-                              {categories.map(category => (
-                                <SelectItem key={category.value} value={category.value}>
-                                  {category.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Select
-                          value={filters.condition || "all"}
-                          onValueChange={handleConditionChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Condition" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Conditions</SelectItem>
-                            <SelectItem value="New">New</SelectItem>
-                            <SelectItem value="Like New">Like New</SelectItem>
-                            <SelectItem value="Good">Good</SelectItem>
-                            <SelectItem value="Fair">Fair</SelectItem>
-                            <SelectItem value="Poor">Poor</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </ScrollArea>
-                  </SheetContent>
-                </Sheet>
-
-                <div className="hidden md:flex items-center gap-2">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="icon"
-                    onClick={() => setViewMode('grid')}
-                    className="hover:bg-gray-100"
-                  >
-                    <Grid2x2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="icon"
-                    onClick={() => setViewMode('list')}
-                    className="hover:bg-gray-100"
-                  >
-                    <LayoutList className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <Select
-                defaultValue={filters.sortBy || 'newest'}
-                onValueChange={handleSort}
+      <div className="sticky top-0 z-10 bg-white shadow-sm transition-all duration-300">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-black/5 transition-colors h-8"
+                onClick={() => setIsFiltersOpen(true)}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                  <SelectItem value="views-desc">Most Viewed</SelectItem>
-                </SelectContent>
-              </Select>
+                <Filter className="h-4 w-4" />
+                <span className="font-medium">Filters</span>
+              </Button>
+              <SheetContent side="left" className="w-full sm:w-[400px] p-0">
+                <SheetHeader className="px-6 py-4 border-b sticky top-0 bg-white z-10">
+                  <div className="flex items-center justify-between">
+                    <SheetTitle>Filters</SheetTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={clearFilters} 
+                      className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      Reset all
+                    </Button>
+                  </div>
+                </SheetHeader>
+                <ScrollArea className="h-[calc(100vh-80px)]">
+                  <div className="p-6 space-y-6">
+                    {/* Search Section */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium text-gray-700">Search</label>
+                          {filters.search && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleFilterChange('search', '')}
+                              className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                            >
+                              Clear
+                            </Button>
+                          )}
+                        </div>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input
+                            type="text"
+                            placeholder="Search products..."
+                            value={filters.search || ''}
+                            onChange={(e) => handleFilterChange('search', e.target.value)}
+                            className="w-full pl-10 bg-black/5 border-none focus-visible:ring-1 focus-visible:ring-black rounded-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700">Category</label>
+                        {filters.category && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleCategoryFilter('all')}
+                            className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            Clear
+                          </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {categories.map(category => (
+                          <button
+                            key={category.value}
+                            onClick={() => handleCategoryFilter(category.value)}
+                            className={`
+                              flex items-center gap-2 p-3 rounded-xl text-left transition-all
+                              ${filters.category === category.value 
+                                ? 'bg-black text-white' 
+                                : 'bg-black/5 hover:bg-black/10 text-gray-700'
+                              }
+                            `}
+                          >
+                            <span className="text-sm font-medium">{category.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price Range Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700">Price Range</label>
+                        {(currentPriceRange[0] !== 0 || currentPriceRange[1] !== 1000000) && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleFilterChange('priceRange', defaultPriceRange)}
+                            className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            Reset
+                          </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">Min Price</label>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={currentPriceRange[0]}
+                            onChange={(e) => handleFilterChange('priceRange', [Number(e.target.value), currentPriceRange[1]])}
+                            className="w-full bg-black/5 border-none focus-visible:ring-1 focus-visible:ring-black rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">Max Price</label>
+                          <Input
+                            type="number"
+                            placeholder="Any"
+                            value={currentPriceRange[1]}
+                            onChange={(e) => handleFilterChange('priceRange', [currentPriceRange[0], Number(e.target.value)])}
+                            className="w-full bg-black/5 border-none focus-visible:ring-1 focus-visible:ring-black rounded-xl"
+                          />
+                        </div>
+                      </div>
+                      <Slider
+                        value={currentPriceRange}
+                        max={1000000}
+                        step={1000}
+                        className="mt-6"
+                        onValueChange={(value: [number, number]) => {
+                          handleFilterChange('priceRange', value);
+                        }}
+                      />
+                      <div className="flex justify-between items-center text-xs text-gray-500 mt-2">
+                        <span>${currentPriceRange[0].toLocaleString()}</span>
+                        <span>${currentPriceRange[1].toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Condition Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700">Condition</label>
+                        {filters.condition && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleConditionChange('all')}
+                            className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            Clear
+                          </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['New', 'Like New', 'Good', 'Fair'].map((condition) => (
+                          <button
+                            key={condition}
+                            onClick={() => handleConditionChange(condition)}
+                            className={`
+                              flex items-center justify-center p-3 rounded-xl transition-all
+                              ${filters.condition === condition 
+                                ? 'bg-black text-white' 
+                                : 'bg-black/5 hover:bg-black/10 text-gray-700'
+                              }
+                            `}
+                          >
+                            <span className="text-sm font-medium">{condition}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Seller Rating Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700">Seller Rating</label>
+                        {filters.minRating && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleFilterChange('minRating', undefined)}
+                            className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            Clear
+                          </Button>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        {[4, 3, 2].map((rating) => (
+                          <button
+                            key={rating}
+                            onClick={() => handleFilterChange('minRating', rating)}
+                            className={`
+                              w-full flex items-center justify-between p-3 rounded-xl transition-all
+                              ${filters.minRating === rating 
+                                ? 'bg-black text-white' 
+                                : 'bg-black/5 hover:bg-black/10 text-gray-700'
+                              }
+                            `}
+                          >
+                            <div className="flex items-center gap-1">
+                              {Array.from({ length: rating }).map((_, i) => (
+                                <Star key={i} className={`h-4 w-4 ${filters.minRating === rating ? 'fill-white text-white' : 'fill-yellow-400 text-yellow-400'}`} />
+                              ))}
+                              {Array.from({ length: 5 - rating }).map((_, i) => (
+                                <Star key={i + rating} className={`h-4 w-4 ${filters.minRating === rating ? 'text-white/30' : 'text-gray-300'}`} />
+                              ))}
+                            </div>
+                            <span className="text-sm font-medium">& up</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Apply Filters Button */}
+                    <div className="sticky bottom-0 bg-white border-t p-4 -mx-6 -mb-6">
+                      <Button 
+                        className="w-full bg-black hover:bg-black/90 text-white"
+                        onClick={() => setIsFiltersOpen(false)}
+                      >
+                        Show Results
+                      </Button>
+                    </div>
+                  </div>
+                </ScrollArea>
+              </SheetContent>
+            </Sheet>
+
+            <div className="hidden md:flex items-center gap-1.5">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-8 px-3 hover:bg-black/5 transition-colors"
+              >
+                <Grid2x2 className="h-4 w-4 mr-2" />
+                Grid
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="h-8 px-3 hover:bg-black/5 transition-colors"
+              >
+                <LayoutList className="h-4 w-4 mr-2" />
+                List
+              </Button>
             </div>
-            
-            {/* Active Filters */}
-            {Object.keys(filters).some(key => {
-              if (key === 'priceRange') return false
-              if (key === 'sortBy') return false
-              return filters[key as keyof typeof filters]
-            }) && (
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Select
+              defaultValue={filters.sortBy || 'newest'}
+              onValueChange={handleSort}
+            >
+              <SelectTrigger className="w-[160px] h-9 bg-black/5 border-none hover:bg-black/10 transition-colors rounded-full">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                <SelectItem value="views-desc">Most Viewed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Active Filters */}
+        {Object.keys(filters).some(key => {
+          if (key === 'priceRange') return false
+          if (key === 'sortBy') return false
+          if (key === 'category') return false
+          return filters[key as keyof typeof filters]
+        }) && (
+          <div className="border-t">
+            <div className="container mx-auto px-4 py-2">
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-500">Active filters:</span>
-                <div className="flex flex-wrap gap-2">
+                <span className="text-gray-500">Filters:</span>
+                <div className="flex flex-wrap gap-1.5">
                   {Object.entries(filters).map(([key, value]) => {
-                    if (key === 'priceRange' || key === 'sortBy') return null
+                    if (key === 'priceRange' || key === 'sortBy' || key === 'category') return null
                     if (!value) return null
                     return (
                       <span
                         key={key}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 cursor-pointer transform hover:scale-105 transition-all"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-black/5 hover:bg-black/10 rounded-full text-gray-700 cursor-pointer transform hover:scale-105 transition-all text-xs font-medium"
                         onClick={() => handleFilterChange(key as keyof ProductFilters, undefined)}
                       >
                         {key}: {value}
@@ -358,304 +530,207 @@ export default function MarketplacePage() {
                     )
                   })}
                   <Button 
-                    variant="link" 
-                    className="text-sm h-auto p-0 hover:text-red-500 transition-colors"
+                    variant="ghost" 
+                    size="sm"
+                    className="text-xs h-6 px-2 text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                     onClick={clearFilters}
                   >
                     Clear all
                   </Button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-5 gap-6">
           {/* Desktop Filters Sidebar */}
-          <div className="hidden lg:block">
-            <div className="bg-white rounded-xl p-6 shadow-sm sticky top-24 border border-gray-100">
-              <div className="space-y-6">
-                {/* Category Filter */}
-                <div className="border-b pb-6">
-                  <label className="block text-sm font-medium mb-3">Category</label>
-                  <Select
-                    value={filters.category || "all"}
-                    onValueChange={handleCategoryFilter}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Price Range Filter */}
-                <div className="border-b pb-6">
-                  <label className="block text-sm font-medium mb-3">Price</label>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">Price Range</span>
-                      <span className="text-sm text-gray-500">
-                        ${currentPriceRange[0].toLocaleString()} - ${currentPriceRange[1].toLocaleString()}
-                      </span>
-                    </div>
-                    <Slider
-                      value={currentPriceRange}
-                      max={1000000}
-                      step={1000}
-                      onValueChange={(value: [number, number]) => {
-                        handleFilterChange('priceRange', value);
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Condition Filter */}
-                <div className="border-b pb-6">
-                  <label className="block text-sm font-medium mb-3">Condition</label>
-                  <div className="space-y-2">
-                    {['New', 'Like New', 'Good', 'Fair'].map((condition) => (
-                      <label key={condition} className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg cursor-pointer">
-                        <input
-                          type="radio"
-                          name="condition"
-                          className="rounded border-gray-300"
-                          checked={filters.condition === condition}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              handleFilterChange('condition', condition);
-                            }
-                          }}
-                        />
-                        <span className="text-sm">{condition}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Seller Rating Filter */}
-                <div className="border-b pb-6">
-                  <label className="block text-sm font-medium mb-3">Seller Rating</label>
-                  <div className="space-y-2">
-                    {[4, 3, 2].map((rating) => (
-                      <label key={rating} className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg cursor-pointer">
-                        <input
-                          type="radio"
-                          name="rating"
-                          className="rounded border-gray-300"
-                          checked={filters.minRating === rating}
-                          onChange={() => handleFilterChange('minRating', rating)}
-                        />
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: rating }).map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                          <span className="text-sm">& up</span>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
+          <div className="hidden lg:block lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-sm sticky top-[4.5rem]">
+              {/* ... rest of sidebar content ... */}
             </div>
           </div>
 
           {/* Listings Grid */}
-          <div className="lg:col-span-3">
+          <div className={`${isFiltersOpen ? 'lg:col-span-4' : 'lg:col-span-5'} transition-all duration-300`}>
             {loading ? (
-              <div className={`grid gap-6 ${
+              <div className={`grid gap-4 ${
                 viewMode === 'grid' 
-                  ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
+                  ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' 
                   : 'grid-cols-1'
               }`}>
                 {Array.from({ length: itemsPerPage }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-square rounded-t-xl" />
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                        <div className="h-4 bg-gray-200 rounded w-1/4" />
-                        <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <Card key={i} className="animate-pulse overflow-hidden bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className="bg-black/5 aspect-square" />
+                    <CardContent className="p-3">
+                      <div className="space-y-2">
+                        <div className="h-4 bg-black/5 rounded-full w-3/4" />
+                        <div className="h-4 bg-black/5 rounded-full w-1/4" />
+                        <div className="h-4 bg-black/5 rounded-full w-1/2" />
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <AlertTriangle className="h-12 w-12 text-red-400 mx-auto" />
-                <h3 className="text-lg font-medium text-gray-900 mt-4">
-                  Failed to load listings
-                </h3>
-                <p className="mt-1 text-gray-500">
-                  Please try again later
-                </p>
-                <Button
-                  className="mt-4"
-                  onClick={() => window.location.reload()}
-                >
-                  Retry
-                </Button>
-              </div>
             ) : (
               <>
-                {currentListings.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="mb-4">
-                      <Search className="h-12 w-12 text-gray-400 mx-auto" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900">No listings found</h3>
-                    <p className="mt-1 text-gray-500">
-                      Try adjusting your search or filter criteria
-                    </p>
-                    <Button
-                      className="mt-4"
-                      onClick={clearFilters}
-                    >
-                      Clear all filters
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className={`grid gap-6 ${
-                      viewMode === 'grid' 
-                        ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
-                        : 'grid-cols-1'
-                    }`}>
-                      {currentListings.map((product, index) => (
-                        <FadeIn key={product._id} delay={index * 100}>
-                          <Card 
-                            className={`group overflow-hidden hover:shadow-lg transition-all duration-300 ${
-                              viewMode === 'list' ? 'flex' : ''
-                            }`}
-                          >
-                            {/* Image section with quick view */}
-                            <div 
-                              className={`relative ${
-                                viewMode === 'list' ? 'w-48' : 'aspect-square'
-                              }`}
-                              onClick={() => setQuickViewItem(product)}
+                <div className={`grid gap-6 ${
+                  viewMode === 'grid' 
+                    ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' 
+                    : 'grid-cols-1 gap-y-4'
+                }`}>
+                  {currentListings.map((product, index) => (
+                    <FadeIn key={product._id} delay={index * 50}>
+                      <Card 
+                        className={`group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${
+                          viewMode === 'list' ? 'flex h-48' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/marketplace/listing/${product._id}`);
+                        }}
+                      >
+                        {/* Image section */}
+                        <div 
+                          className={`relative overflow-hidden ${
+                            viewMode === 'list' 
+                              ? 'w-48 rounded-l-2xl' 
+                              : 'aspect-square rounded-t-2xl'
+                          }`}
+                        >
+                          {!failedImages.has(product.images[0]) ? (
+                            <img 
+                              src={product.images[0]} 
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              onError={() => handleImageError(product.images[0])}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-black/5 flex items-center justify-center">
+                              <AlertTriangle className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          {product.images.length > 1 && (
+                            <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                              <ImageIcon className="h-3 w-3" />
+                              {product.images.length}
+                            </div>
+                          )}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Add to wishlist
+                              }}
                             >
-                              {!failedImages.has(product.images[0]) ? (
-                                <img 
-                                  src={product.images[0]} 
-                                  alt={product.name}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  onError={() => handleImageError(product.images[0])}
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                  <AlertTriangle className="h-8 w-8 text-gray-400" />
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors cursor-pointer flex items-center justify-center">
-                                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-full text-sm">
-                                  Quick View
-                                </span>
+                              <Heart className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="absolute bottom-2 left-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="h-6 w-6 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-sm font-medium">
+                                {product.seller.name.charAt(0)}
                               </div>
-                              {product.images.length > 1 && (
-                                <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                                  <ImageIcon className="h-3 w-3" />
-                                  {product.images.length}
-                                </div>
-                              )}
+                              <span className="text-xs font-medium text-white drop-shadow-sm">
+                                {product.seller.name.split(' ')[0]}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Content section */}
+                        <CardContent className={`${
+                          viewMode === 'list' 
+                            ? 'flex-1 p-4 flex flex-col justify-between' 
+                            : 'p-4'
+                        }`}>
+                          <div className={`space-y-3 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-1 flex-1">
+                                <h3 className="font-medium line-clamp-2 leading-tight">
+                                  {product.name}
+                                </h3>
+                                {viewMode === 'list' && (
+                                  <p className="text-sm text-gray-600 line-clamp-2">
+                                    {product.description}
+                                  </p>
+                                )}
+                              </div>
+                              <span className="font-semibold whitespace-nowrap text-green-600">
+                                ${product.price.toLocaleString()}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                <span>{product.location}</span>
+                              </div>
+                              <span>•</span>
+                              <span>{product.timeAgo}</span>
                             </div>
 
-                            {/* Content section */}
-                            <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                              <div className="space-y-3">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div>
-                                    <h3 className="font-medium line-clamp-1 group-hover:text-blue-600 transition-colors">
-                                      {product.name}
-                                    </h3>
-                                    {viewMode === 'list' && (
-                                      <p className="text-sm text-gray-600 line-clamp-2 mt-1">
-                                        {product.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <span className="font-semibold whitespace-nowrap text-green-600">
-                                    ${product.price.toLocaleString()}
-                                  </span>
+                            {viewMode === 'list' && (
+                              <div className="flex items-center gap-4 mt-auto pt-4">
+                                <div className="flex items-center gap-1 text-sm">
+                                  <Eye className="h-4 w-4 text-gray-400" />
+                                  <span className="text-gray-500">{product.views || 0} views</span>
                                 </div>
-                                
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                  <div className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
-                                    <span>{product.location}</span>
-                                  </div>
-                                  <span>•</span>
-                                  <span>{product.timeAgo}</span>
-                                </div>
-
-                                <div className="flex items-center justify-between pt-2 border-t">
+                                {product.seller.rating && (
                                   <div className="flex items-center gap-1 text-sm">
-                                    <span className="text-gray-600">
-                                      {product.seller.name.split(' ')[0]} {product.seller.name.split(' ')[1]?.charAt(0)}.
-                                    </span>
+                                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                                    <span className="text-gray-500">{product.seller.rating}</span>
                                   </div>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setQuickViewItem(product);
-                                    }}
-                                  >
-                                    View Details
-                                  </Button>
-                                </div>
+                                )}
                               </div>
-                            </CardContent>
-                          </Card>
-                        </FadeIn>
-                      ))}
-                    </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </FadeIn>
+                  ))}
+                </div>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                      <div className="mt-8 flex items-center justify-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                          disabled={currentPage === 1}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                          <Button
-                            key={page}
-                            variant={currentPage === page ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </Button>
-                        ))}
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                          disabled={currentPage === totalPages}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-8 flex items-center justify-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="h-8 px-2 hover:bg-black/5 rounded-full"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 rounded-full ${currentPage === page ? 'bg-black text-white hover:bg-black/90' : 'hover:bg-black/5'}`}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="h-8 px-2 hover:bg-black/5 rounded-full"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
               </>
             )}
@@ -663,112 +738,110 @@ export default function MarketplacePage() {
         </div>
       </div>
 
+      {/* Floating Action Button - Create Listing */}
+      <Link 
+        to="/create" 
+        className="fixed bottom-6 right-6 bg-black text-white rounded-full p-4 shadow-lg hover:bg-black/90 transition-colors"
+      >
+        <Plus className="h-6 w-6" />
+      </Link>
+
       {/* Quick View Modal */}
       <Dialog open={!!quickViewItem} onOpenChange={() => setQuickViewItem(null)}>
-        <DialogContent className="max-w-2xl" hideClose>
+        <DialogContent className="max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden" hideClose>
           {quickViewItem && (
-            <>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-4 top-4 h-8 w-8" 
-                onClick={() => setQuickViewItem(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <div className="absolute right-12 top-4">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setIsSharingModalOpen(true)}>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share Listing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
-                      <Flag className="h-4 w-4 mr-2" />
-                      Report Listing
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6 pt-6">
-                <div className="space-y-4">
-                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative group">
-                    {!failedImages.has(quickViewItem.images[selectedImage]) ? (
-                      <img 
-                        src={quickViewItem.images[selectedImage]} 
-                        alt={quickViewItem.name}
-                        className="w-full h-full object-cover"
-                        onError={() => handleImageError(quickViewItem.images[selectedImage])}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <AlertTriangle className="h-12 w-12 text-gray-400" />
-                      </div>
-                    )}
-                    {quickViewItem.images.length > 1 && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0"
-                          onClick={() => setSelectedImage(prev => prev - 1)}
-                          disabled={selectedImage === 0}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0"
-                          onClick={() => setSelectedImage(prev => prev + 1)}
-                          disabled={selectedImage === quickViewItem.images.length - 1}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                  {quickViewItem.images.length > 1 && (
-                    <div className="grid grid-cols-4 gap-2">
-                      {quickViewItem.images.map((image, i) => (
-                        <button
-                          key={i}
-                          className={`aspect-square rounded-md overflow-hidden bg-gray-100 relative ${
-                            selectedImage === i ? 'ring-2 ring-black' : ''
-                          }`}
-                          onClick={() => setSelectedImage(i)}
-                        >
-                          {!failedImages.has(image) ? (
-                            <img 
-                              src={image}
-                              alt={`${quickViewItem.name} - ${i + 1}`}
-                              className="w-full h-full object-cover hover:opacity-80 transition-opacity"
-                              onError={() => handleImageError(image)}
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                              <AlertTriangle className="h-4 w-4 text-gray-400" />
-                            </div>
-                          )}
-                        </button>
-                      ))}
+            <div className="flex flex-col md:flex-row h-[80vh]">
+              {/* Image Gallery */}
+              <div className="relative w-full md:w-3/5 bg-black flex items-center">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-4 top-4 h-8 w-8 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full text-white z-10" 
+                  onClick={() => setQuickViewItem(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <div className="absolute right-14 top-4 z-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full text-white">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => setIsSharingModalOpen(true)} className="gap-2">
+                        <Share2 className="h-4 w-4" />
+                        Share Listing
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setIsReportModalOpen(true)} className="gap-2 text-red-600">
+                        <Flag className="h-4 w-4" />
+                        Report Listing
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="w-full h-full flex items-center justify-center">
+                  {!failedImages.has(quickViewItem.images[selectedImage]) ? (
+                    <img 
+                      src={quickViewItem.images[selectedImage]} 
+                      alt={quickViewItem.name}
+                      className="w-full h-full object-contain"
+                      onError={() => handleImageError(quickViewItem.images[selectedImage])}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-black flex items-center justify-center">
+                      <AlertTriangle className="h-12 w-12 text-gray-400" />
                     </div>
                   )}
+                  {quickViewItem.images.length > 1 && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full text-white disabled:opacity-0"
+                        onClick={() => setSelectedImage(prev => prev - 1)}
+                        disabled={selectedImage === 0}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full text-white disabled:opacity-0"
+                        onClick={() => setSelectedImage(prev => prev + 1)}
+                        disabled={selectedImage === quickViewItem.images.length - 1}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-xl font-semibold">{quickViewItem.name}</h2>
-                    <p className="text-gray-600 mt-2">{quickViewItem.description}</p>
+                {quickViewItem.images.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {quickViewItem.images.map((_, i) => (
+                      <button
+                        key={i}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          selectedImage === i ? 'bg-white w-4' : 'bg-white/50'
+                        }`}
+                        onClick={() => setSelectedImage(i)}
+                      />
+                    ))}
                   </div>
-                  <div className="text-2xl font-bold text-green-600">
+                )}
+              </div>
+
+              {/* Product Info */}
+              <div className="w-full md:w-2/5 bg-white p-6 overflow-y-auto">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-2">{quickViewItem.name}</h2>
+                    <p className="text-gray-600">{quickViewItem.description}</p>
+                  </div>
+                  <div className="text-3xl font-bold text-green-600">
                     ${quickViewItem.price.toLocaleString()}
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <MapPin className="h-4 w-4" />
                       {quickViewItem.location}
@@ -778,51 +851,51 @@ export default function MarketplacePage() {
                       {quickViewItem.timeAgo}
                     </div>
                   </div>
-                  <div className="border-t pt-4">
-                    <h3 className="font-medium mb-2">Seller Information</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  <div className="border-t pt-6">
+                    <h3 className="font-medium mb-4">Seller Information</h3>
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-black/5 flex items-center justify-center text-sm font-medium">
                         {quickViewItem.seller.name.charAt(0)}
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {quickViewItem.seller.name.split(' ')[0]} {quickViewItem.seller.name.split(' ')[1]?.charAt(0)}.
+                            {quickViewItem.seller.name}
                           </span>
+                          <div className="flex items-center gap-1 text-yellow-400">
+                            <Star className="h-4 w-4 fill-current" />
+                            <span className="text-sm">{quickViewItem.seller.rating}</span>
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 mt-0.5">
                           Member since {quickViewItem.seller.memberSince} • {quickViewItem.seller.listings} listings
                         </div>
                       </div>
                     </div>
                     <div className="mt-4 space-y-3">
                       <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-yellow-400" />
-                          {quickViewItem.seller.rating} rating
-                        </div>
                         <div>Response rate: {quickViewItem.seller.responseRate}</div>
                         <div>Response time: {quickViewItem.seller.responseTime}</div>
                       </div>
                       {revealedModalContact ? (
-                        <div className="space-y-2">
+                        <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-700">Contact Information</span>
+                            <span className="text-sm font-medium">Contact Information</span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 hover:bg-red-50 hover:text-red-600 transition-colors"
+                              className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
                               onClick={() => setRevealedModalContact(false)}
                             >
                               <EyeOff className="h-4 w-4 mr-2" />
-                              Hide Contact
+                              Hide
                             </Button>
                           </div>
-                          <div className="flex flex-col gap-2 text-sm">
+                          <div className="space-y-2">
                             {quickViewItem.seller.phone && (
                               <a 
                                 href={`tel:${quickViewItem.seller.phone}`}
-                                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                                className="flex items-center gap-2 p-2 rounded-lg hover:bg-white text-gray-600 hover:text-gray-900 transition-colors"
                               >
                                 <Phone className="h-4 w-4" />
                                 {quickViewItem.seller.phone}
@@ -831,7 +904,7 @@ export default function MarketplacePage() {
                             {quickViewItem.seller.email && (
                               <a 
                                 href={`mailto:${quickViewItem.seller.email}`}
-                                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                                className="flex items-center gap-2 p-2 rounded-lg hover:bg-white text-gray-600 hover:text-gray-900 transition-colors"
                               >
                                 <Mail className="h-4 w-4" />
                                 {quickViewItem.seller.email}
@@ -841,26 +914,24 @@ export default function MarketplacePage() {
                         </div>
                       ) : (
                         <Button
-                          className="w-full"
-                          variant="outline"
+                          className="w-full bg-black hover:bg-black/90 text-white"
                           onClick={() => setRevealedModalContact(true)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
-                          <Shield className="h-3 w-3 mr-2" />
                           Show Contact Information
                         </Button>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 pt-4 border-t">
-                    <Button className="w-full">
+                  <div className="flex items-center gap-4 pt-6 border-t">
+                    <Button className="w-full bg-black hover:bg-black/90 text-white">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Message Seller
                     </Button>
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>
@@ -870,27 +941,31 @@ export default function MarketplacePage() {
         <DialogContent className="sm:max-w-md">
           <DialogTitle>Report Listing</DialogTitle>
           <DialogDescription>
-            Please select a reason for reporting this listing. Your report will be reviewed by our team.
+            Help us understand what's wrong with this listing. Your report will be reviewed by our team.
           </DialogDescription>
-          <div className="space-y-2">
+          <div className="space-y-2 mt-4">
             {[
               'Fraudulent or scam',
               'Inappropriate content',
               'Misleading information',
               'Wrong category',
+              'Prohibited item',
               'Other'
             ].map(reason => (
-              <label key={reason} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                <input type="radio" name="report-reason" className="rounded border-gray-300" />
-                <span>{reason}</span>
+              <label 
+                key={reason} 
+                className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl cursor-pointer border border-transparent hover:border-gray-100 transition-colors"
+              >
+                <input type="radio" name="report-reason" className="rounded-full border-gray-300" />
+                <span className="text-sm">{reason}</span>
               </label>
             ))}
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsReportModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setIsReportModalOpen(false)}>
+            <Button onClick={() => setIsReportModalOpen(false)} className="bg-red-600 hover:bg-red-700">
               Submit Report
             </Button>
           </DialogFooter>
@@ -904,37 +979,37 @@ export default function MarketplacePage() {
           <DialogDescription>
             Share this listing with others through your preferred platform.
           </DialogDescription>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full h-12 gap-3"
               onClick={() => handleShare('facebook')}
             >
-              <Facebook className="h-4 w-4 mr-2" />
+              <Facebook className="h-5 w-5 text-blue-600" />
               Facebook
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full h-12 gap-3"
               onClick={() => handleShare('twitter')}
             >
-              <Twitter className="h-4 w-4 mr-2" />
+              <Twitter className="h-5 w-5 text-blue-400" />
               Twitter
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full h-12 gap-3"
               onClick={() => handleShare('linkedin')}
             >
-              <Linkedin className="h-4 w-4 mr-2" />
+              <Linkedin className="h-5 w-5 text-blue-700" />
               LinkedIn
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full h-12 gap-3"
               onClick={() => handleShare('copy')}
             >
-              <LinkIcon className="h-4 w-4 mr-2" />
+              <LinkIcon className="h-5 w-5" />
               Copy Link
             </Button>
           </div>

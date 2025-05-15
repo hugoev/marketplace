@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight, Search, Heart, MessageCircle, DollarSign, Shield, Clock, Users, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
+import { ArrowRight, Search, Heart, MessageCircle, DollarSign, Shield, Clock, Users, Facebook, Twitter, Instagram, Linkedin, MapPin } from 'lucide-react'
 import { categories, listings } from '@/lib/mock-data'
 import { ScrollToTop } from '@/components/ScrollToTop'
 import { FadeIn } from '@/components/FadeIn'
@@ -50,72 +50,104 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-white via-gray-50 to-gray-100 border-b">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <span className="inline-block px-4 py-1.5 bg-black text-white text-sm rounded-full">
-                  New on Marketplace
-                </span>
-                <h1 className="text-5xl font-bold tracking-tight mb-4 bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
-                  Your Local Marketplace
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-gray-100 border-b min-h-[90vh] flex items-center">
+        {/* Animated background pattern */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6IiBzdHJva2U9InJnYmEoMCwwLDAsMC4wNSkiIHN0cm9rZS13aWR0aD0iMiIvPjwvZz48L3N2Zz4=')] opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white" />
+        </div>
+
+        <div className="container mx-auto px-4 py-16 relative">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-black text-white text-sm rounded-full">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    New on Marketplace
+                  </span>
+                  <span className="px-3 py-1 bg-green-50 text-green-600 text-sm rounded-full font-medium">
+                    50K+ Active Users
+                  </span>
+                </div>
+                <h1 className="text-7xl font-bold tracking-tight bg-gradient-to-br from-black via-gray-700 to-gray-800 bg-clip-text text-transparent">
+                  Your Local
+                  <br />
+                  Marketplace
                 </h1>
-                <p className="text-xl text-gray-600">
-                  Buy and sell items easily in your local community
+                <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
+                  Discover unique items, connect with sellers, and find amazing deals in your local community. Join thousands of happy users today.
                 </p>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4 max-w-md">
-                <Link to="/create">
-                  <Button size="lg" className="bg-black hover:bg-black/90 text-white rounded-full h-12 hover:scale-105 transition-transform w-full">
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md">
+                <Link to="/create" className="flex-1">
+                  <Button size="lg" className="bg-black hover:bg-black/90 text-white rounded-full h-14 hover:scale-105 transition-all duration-300 w-full font-medium shadow-lg hover:shadow-xl">
                     Start Selling
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Link to="/marketplace">
-                  <Button size="lg" variant="outline" className="rounded-full h-12 hover:scale-105 transition-transform w-full">
+                <Link to="/marketplace" className="flex-1">
+                  <Button size="lg" variant="outline" className="rounded-full h-14 hover:scale-105 transition-all duration-300 w-full font-medium border-2">
                     Browse Items
                   </Button>
                 </Link>
               </div>
+              <div className="flex items-center gap-8 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Secure Payments
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  24/7 Support
+                </div>
+              </div>
             </div>
-            <div className="hidden lg:block">
-              {/* Hero Image Grid - Updated with real images */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="aspect-square rounded-2xl bg-gray-100 overflow-hidden">
+
+            <div className="hidden lg:block relative">
+              {/* Hero Image Grid */}
+              <div className="grid grid-cols-2 gap-6 transform hover:scale-[1.02] transition-all duration-700">
+                <div className="space-y-6">
+                  <div className="aspect-square rounded-3xl bg-gray-100 overflow-hidden shadow-2xl">
                     <img 
                       src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070" 
                       alt="Nike Shoes"
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
-                  <div className="aspect-square rounded-2xl bg-gray-100 overflow-hidden">
+                  <div className="aspect-square rounded-3xl bg-gray-100 overflow-hidden shadow-2xl">
                     <img 
                       src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1932" 
                       alt="Furniture"
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                 </div>
-                <div className="pt-8">
-                  <div className="aspect-square rounded-2xl bg-gray-100 overflow-hidden">
+                <div className="pt-12">
+                  <div className="aspect-square rounded-3xl bg-gray-100 overflow-hidden shadow-2xl">
                     <img 
                       src="https://images.unsplash.com/photo-1605464315542-bda3e2f4e605?q=80&w=2070" 
                       alt="Electronics"
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                 </div>
               </div>
+              {/* Decorative elements */}
+              <div className="absolute -top-12 -right-12 w-24 h-24 bg-yellow-100 rounded-full blur-3xl opacity-60" />
+              <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-60" />
             </div>
           </div>
         </div>
       </section>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-24">
         {/* Stats Section */}
-        <section className="mb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="mb-32">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: "Active Users", value: "50K+", icon: Users, delay: 0 },
               { label: "Daily Listings", value: "1000+", icon: DollarSign, delay: 100 },
@@ -123,15 +155,16 @@ export default function HomePage() {
               { label: "Response Time", value: "< 10min", icon: Clock, delay: 300 }
             ].map((stat) => (
               <FadeIn key={stat.label} delay={stat.delay}>
-                <Card className="group hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6 flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-black/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <stat.icon className="h-6 w-6 text-black" />
+                <Card className="group hover:shadow-xl transition-all duration-500 border-none bg-gradient-to-br from-white to-gray-50 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/[0.02] to-transparent" />
+                  <CardContent className="p-8 relative">
+                    <div className="h-14 w-14 rounded-2xl bg-black/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 mb-4">
+                      <stat.icon className="h-7 w-7 text-black" />
                     </div>
-                    <div>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-sm text-gray-600">{stat.label}</p>
-                    </div>
+                    <p className="text-4xl font-bold mb-2 bg-gradient-to-br from-black to-gray-600 bg-clip-text text-transparent">
+                      {stat.value}
+                    </p>
+                    <p className="text-sm text-gray-600">{stat.label}</p>
                   </CardContent>
                 </Card>
               </FadeIn>
@@ -140,26 +173,41 @@ export default function HomePage() {
         </section>
 
         {/* Featured Categories */}
-        <section className="mb-12">
+        <section className="mb-32">
           <FadeIn>
-            <h2 className="text-2xl font-semibold mb-6">Popular Categories</h2>
+            <div className="flex items-center justify-between mb-12">
+              <div className="space-y-2">
+                <h2 className="text-4xl font-bold">Popular Categories</h2>
+                <p className="text-gray-600">Explore our most popular categories</p>
+              </div>
+              <Link 
+                to="/marketplace" 
+                className="group flex items-center gap-2 px-6 py-3 bg-black/5 hover:bg-black/10 rounded-full transition-colors"
+              >
+                <span className="text-sm font-medium">View all categories</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </FadeIn>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {categories.map((category, index) => (
               <FadeIn key={category.name} delay={index * 100}>
                 <Link 
                   to={`/marketplace?category=${category.slug}`}
-                  className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 hover:shadow-xl transition-all duration-300"
+                  className="group relative aspect-[4/5] rounded-3xl overflow-hidden bg-gray-100 hover:shadow-2xl transition-all duration-500"
                 >
                   <img 
                     src={category.image} 
                     alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60 group-hover:opacity-70 transition-opacity" />
-                  <div className="absolute inset-0 p-4 flex flex-col justify-end transform group-hover:translate-y-[-4px] transition-transform">
-                    <h3 className="text-white font-medium text-lg">{category.name}</h3>
-                    <p className="text-white/90 text-sm">{category.count} items</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-70 transition-opacity" />
+                  <div className="absolute inset-0 p-8 flex flex-col justify-end transform group-hover:translate-y-[-8px] transition-transform duration-500">
+                    <h3 className="text-white font-semibold text-2xl mb-2">{category.name}</h3>
+                    <p className="text-white/90 text-sm flex items-center gap-2">
+                      {category.count} items
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </p>
                   </div>
                 </Link>
               </FadeIn>
@@ -168,47 +216,67 @@ export default function HomePage() {
         </section>
 
         {/* Featured Listings */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold">Featured Listings</h2>
+        <section className="mb-32">
+          <div className="flex items-center justify-between mb-12">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-bold">Featured Listings</h2>
+              <p className="text-gray-600">Handpicked items you might love</p>
+            </div>
             <Link 
               to="/marketplace" 
-              className="text-sm text-gray-600 hover:text-black flex items-center gap-1"
+              className="group flex items-center gap-2 px-6 py-3 bg-black/5 hover:bg-black/10 rounded-full transition-colors"
             >
-              View all
-              <span className="text-lg">→</span>
+              <span className="text-sm font-medium">View all listings</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredListings.map((listing) => (
-              <Link key={listing.id} to={`/listings/${listing.id}`}>
-                <Card className="group overflow-hidden border-0 bg-white hover:shadow-xl transition-all duration-300 rounded-xl">
-                  <div className="aspect-square overflow-hidden bg-gray-100 relative">
-                    <img 
-                      src={listing.image} 
-                      alt={listing.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-medium text-sm line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        {listing.title}
-                      </h3>
-                      <span className="font-semibold whitespace-nowrap text-green-600">
-                        ${listing.price}
-                      </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredListings.map((listing, index) => (
+              <FadeIn key={listing.id} delay={index * 100}>
+                <Link to={`/listings/${listing.id}`}>
+                  <Card className="group overflow-hidden border-none bg-white hover:shadow-2xl transition-all duration-500 rounded-3xl">
+                    <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative rounded-2xl">
+                      <img 
+                        src={listing.image} 
+                        alt={listing.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute top-4 right-4">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white"
+                        >
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{listing.location}</span>
-                      <span className="h-1 w-1 rounded-full bg-gray-300" />
-                      <span>{listing.timeAgo}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="space-y-1 flex-1">
+                          <span className="text-xs font-medium text-gray-500">{listing.category}</span>
+                          <h3 className="font-medium text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {listing.title}
+                          </h3>
+                        </div>
+                        <span className="font-semibold whitespace-nowrap text-green-600 text-xl">
+                          ${listing.price}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span className="flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4" />
+                          {listing.location}
+                        </span>
+                        <span>•</span>
+                        <span>{listing.timeAgo}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </FadeIn>
             ))}
           </div>
         </section>

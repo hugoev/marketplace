@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import MessagesPage from './pages/MessagesPage';
+import ListingDetailPage from './pages/ListingDetailPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,6 +34,7 @@ export default function Routes() {
       <RouterRoutes>
         <Route path="/" element={<HomePage />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/marketplace/listing/:id" element={<ListingDetailPage />} />
         <Route
           path="/create"
           element={
